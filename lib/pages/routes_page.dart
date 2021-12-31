@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:trip_tracker/models/route.dart';
+import 'package:trip_tracker/pages/route_list_item.dart';
 import 'package:trip_tracker/utils/consts.dart';
 
 class RoutesPage extends StatefulWidget {
@@ -23,8 +24,8 @@ class _RoutesPageState extends State<RoutesPage> {
             itemCount: keys.length,
             itemBuilder: (BuildContext context, int index) {
               final int key = keys[index];
-              final dynamic route = box.get(key);
-              return Text(route.name);
+              final TripRoute route = box.get(key);
+              return RouteListItem(routeName: route.name);
             },
           );
         },
