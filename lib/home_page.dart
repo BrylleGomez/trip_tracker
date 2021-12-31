@@ -17,28 +17,38 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int _pageIdx = 0;
 
+  void showNewRouteDialog(BuildContext context) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return const EditRouteDialog();
+        });
+  }
+
   final List<Page> _pages = [
-    Page(
+    const Page(
       navbarIcon: Icons.location_on,
       label: 'Routes',
-      widget: const RoutesPage(),
+      widget: RoutesPage(),
       actionIcon: Icons.add_location_alt_rounded,
-      actionOnPressed: () {
-        const newRoute = TripRoute(name: 'Name', path: 'Path');
-        Hive.box<TripRoute>(hiveRoutesBox).add(newRoute);
-      },
     ),
-    Page(
+    const Page(
       navbarIcon: Icons.list,
       label: 'Trips',
-      widget: const TripsPage(),
+      widget: TripsPage(),
       actionIcon: Icons.add_circle,
-      actionOnPressed: () {
-        const newRoute = TripRoute(name: 'Name', path: 'Path');
-        Hive.box<TripRoute>(hiveRoutesBox).add(newRoute);
-      },
     )
   ];
+
+  void handleFloatingActionOnPressed(BuildContext context, int pageIdx) {
+    switch (pageIdx) {
+      case 0:
+        showNewRouteDialog(context);
+        break;
+      default:
+        showNewRouteDialog(context);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +58,9 @@ class _HomePageState extends State<HomePage> {
       ),
       body: _pages[_pageIdx].widget,
       floatingActionButton: FloatingActionButton(
-        onPressed: _pages[_pageIdx].actionOnPressed,
+        onPressed: () {
+          handleFloatingActionOnPressed(context, _pageIdx);
+        },
         child: Icon(_pages[_pageIdx].actionIcon),
       ),
       bottomNavigationBar: BottomNavigationBar(
@@ -74,11 +86,46 @@ class Page {
   final String label;
   final Widget widget;
   final IconData actionIcon;
-  final Function() actionOnPressed;
-  const Page(
-      {required this.navbarIcon,
-      required this.label,
-      required this.widget,
-      required this.actionIcon,
-      required this.actionOnPressed});
+  const Page({
+    required this.navbarIcon,
+    required this.label,
+    required this.widget,
+    required this.actionIcon,
+  });
+}
+
+class EditRouteDialog extends StatelessWidget {
+  const EditRouteDialog({Key? key}) : super(key: key);
+
+  void handleCancelPressed(BuildContext context) {
+    Navigator.of(context).pop();
+  }
+
+  void handleSavePressed(BuildContext context) {
+    Navigator.of(context).pop();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('Welcome'), // To display the title it is optional
+      content: const Text(
+          'GeeksforGeeks'), // Message which will be pop up on the screen
+      // Action widget which will provide the user to acknowledge the choice
+      actions: [
+        TextButton(
+          onPressed: () {
+            handleCancelPressed(context);
+          },
+          child: const Text('CANCEL'),
+        ),
+        TextButton(
+          onPressed: () {
+            handleSavePressed(context);
+          },
+          child: const Text('SAVE'),
+        ),
+      ],
+    );
+  }
 }
