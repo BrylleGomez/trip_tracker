@@ -19,14 +19,16 @@ class _RoutesPageState extends State<RoutesPage> {
         valueListenable: Hive.box<TripRoute>(hiveRoutesBox).listenable(),
         builder: (context, box, widget) {
           List<int> keys = box.keys.cast<int>().toList();
-          return ListView.builder(
-            shrinkWrap: true,
-            itemCount: keys.length,
-            itemBuilder: (BuildContext context, int index) {
-              final int key = keys[index];
-              final TripRoute route = box.get(key);
-              return RouteListItem(routeName: route.name);
-            },
+          return Scrollbar(
+            child: ListView.builder(
+              shrinkWrap: true,
+              itemCount: keys.length,
+              itemBuilder: (BuildContext context, int index) {
+                final int key = keys[index];
+                final TripRoute route = box.get(key);
+                return RouteListItem(routeName: route.name);
+              },
+            ),
           );
         },
       ),
