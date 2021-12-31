@@ -12,13 +12,21 @@ class RoutesPage extends StatefulWidget {
 }
 
 class _RoutesPageState extends State<RoutesPage> {
+  void handleDeleteRoute(int key) {
+    Hive.box<TripRoute>(hiveRoutesBox).delete(key);
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: ValueListenableBuilder<Box>(
-        valueListenable: Hive.box<TripRoute>(hiveRoutesBox).listenable(),
-        builder: (context, box, widget) {
-          List<int> keys = box.keys.cast<int>().toList();
+    return ValueListenableBuilder<Box>(
+      valueListenable: Hive.box<TripRoute>(hiveRoutesBox).listenable(),
+      builder: (context, box, widget) {
+        List<int> keys = box.keys.cast<int>().toList();
+        if (keys.isEmpty) {
+          return const Center(
+            child: Text('You have no routes.'),
+          );
+        } else {
           return Scrollbar(
             child: ListView.builder(
               shrinkWrap: true,
@@ -26,12 +34,17 @@ class _RoutesPageState extends State<RoutesPage> {
               itemBuilder: (BuildContext context, int index) {
                 final int key = keys[index];
                 final TripRoute route = box.get(key);
-                return RouteListItem(routeName: route.name);
+                return RouteListItem(
+                  routeName: route.name,
+                  onDelete: () {
+                    handleDeleteRoute(key);
+                  },
+                );
               },
             ),
           );
-        },
-      ),
+        }
+      },
     );
   }
 }
