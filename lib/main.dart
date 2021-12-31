@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:trip_tracker/home_page.dart';
+import 'package:trip_tracker/utils/consts.dart';
 
-void main() {
+void main() async {
+  await Hive.initFlutter();
+  await Hive.openBox(hiveRoutesBox);
   runApp(const MyApp());
 }
 

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:trip_tracker/models/route.dart';
+import 'package:trip_tracker/utils/consts.dart';
 import 'package:trip_tracker/utils/get_random_id.dart';
 
 class RoutesPage extends StatefulWidget {
@@ -29,15 +31,21 @@ class _RoutesPageState extends State<RoutesPage> {
               onPressed: addNewRoute,
               icon: const Icon(Icons.add_location_alt_rounded),
               label: const Text('Add New Route')),
-          ListView.builder(
-            shrinkWrap: true,
-            itemCount: routes.length,
-            itemBuilder: (BuildContext context, int index) {
-              // access element from list using index
-              // you can create and return a widget of your choice
-              return Text(routes[index].name);
+          ValueListenableBuilder<Box>(
+            valueListenable: Hive.box(hiveRoutesBox).listenable(),
+            builder: (context, box, widget) {
+              return Text(box.get(0) ?? 'Heh');
             },
           ),
+          // ListView.builder(
+          //   shrinkWrap: true,
+          //   itemCount: routes.length,
+          //   itemBuilder: (BuildContext context, int index) {
+          //     // access element from list using index
+          //     // you can create and return a widget of your choice
+          //     return Text(routes[index].name);
+          //   },
+          // ),
         ],
       ),
     );
