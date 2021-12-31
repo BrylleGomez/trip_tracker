@@ -4,11 +4,14 @@ import 'package:trip_tracker/models/route.dart';
 import 'package:trip_tracker/utils/consts.dart';
 
 class RouteDialog extends StatefulWidget {
+  final bool isViewing;
   final int? routeKey;
   final TripRoute? route;
-  const RouteDialog({Key? key, this.routeKey, this.route})
-      : assert((routeKey == null && route == null) ||
-            (routeKey != null && route != null)),
+  const RouteDialog(
+      {Key? key, this.isViewing = false, this.routeKey, this.route})
+      : assert((routeKey == null && route == null && !isViewing) ||
+            (routeKey != null && route != null && isViewing) ||
+            (routeKey != null && route != null && !isViewing)),
         super(key: key);
 
   @override
@@ -52,7 +55,11 @@ class _RouteDialogState extends State<RouteDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text(widget.route != null ? 'Edit Route' : 'Add Route'),
+      title: Text(widget.isViewing
+          ? 'View Route'
+          : widget.route != null
+              ? 'Edit Route'
+              : 'Add Route'),
       content: SingleChildScrollView(
         child: Form(
           key: _formKey,
@@ -72,6 +79,7 @@ class _RouteDialogState extends State<RouteDialog> {
                     return "Please enter a route name!";
                   }
                 },
+                enabled: !widget.isViewing,
               ),
               const SizedBox(
                 height: 16.0,
@@ -91,25 +99,28 @@ class _RouteDialogState extends State<RouteDialog> {
                     return "Please enter the path details!";
                   }
                 },
+                enabled: !widget.isViewing,
               )
             ],
           ),
         ),
       ),
-      actions: [
-        TextButton(
-          onPressed: () {
-            _handleCancelPressed(context);
-          },
-          child: const Text('CANCEL'),
-        ),
-        TextButton(
-          onPressed: () {
-            _handleSavePressed(context);
-          },
-          child: const Text('SAVE'),
-        ),
-      ],
+      actions: widget.isViewing
+          ? []
+          : [
+              TextButton(
+                onPressed: () {
+                  _handleCancelPressed(context);
+                },
+                child: const Text('Cancel'),
+              ),
+              TextButton(
+                onPressed: () {
+                  _handleSavePressed(context);
+                },
+                child: const Text('Save'),
+              ),
+            ],
     );
   }
 }

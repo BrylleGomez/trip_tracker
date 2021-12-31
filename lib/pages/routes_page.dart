@@ -14,6 +14,18 @@ class RoutesPage extends StatefulWidget {
 }
 
 class _RoutesPageState extends State<RoutesPage> {
+  void handleViewRoute(BuildContext context, int key, TripRoute route) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return RouteDialog(
+            isViewing: true,
+            routeKey: key,
+            route: route,
+          );
+        });
+  }
+
   void handleEditRoute(BuildContext context, int key, TripRoute route) {
     showDialog(
         context: context,
@@ -49,6 +61,9 @@ class _RoutesPageState extends State<RoutesPage> {
                 final TripRoute route = box.get(key);
                 return RouteListItem(
                   routeName: route.name,
+                  onView: () {
+                    handleViewRoute(context, key, route);
+                  },
                   onEdit: () {
                     handleEditRoute(context, key, route);
                   },
