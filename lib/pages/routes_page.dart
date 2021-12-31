@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:trip_tracker/models/route.dart';
 import 'package:trip_tracker/utils/consts.dart';
-import 'package:trip_tracker/utils/get_random_id.dart';
 
 class RoutesPage extends StatefulWidget {
   const RoutesPage({Key? key}) : super(key: key);
@@ -15,7 +14,7 @@ class _RoutesPageState extends State<RoutesPage> {
   final List<TripRoute> routes = [];
 
   void addNewRoute() {
-    final newRoute = TripRoute(id: getRandom(6), name: 'Name', path: 'Path');
+    const newRoute = TripRoute(name: 'Name', path: 'Path');
     setState(() {
       routes.add(newRoute);
     });

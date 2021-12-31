@@ -1,7 +1,12 @@
+import 'package:hive/hive.dart';
+part 'route.g.dart';
+
+@HiveType(typeId: 1)
 class TripRoute {
-  final String id;
+  @HiveField(0)
   final String name;
+  @HiveField(1)
   final String path;
 
-  const TripRoute({required this.id, required this.name, required this.path});
+  const TripRoute({required this.name, required this.path});
 }
