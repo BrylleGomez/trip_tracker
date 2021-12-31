@@ -4,6 +4,8 @@ import 'package:trip_tracker/models/route.dart';
 import 'package:trip_tracker/pages/route_list_item.dart';
 import 'package:trip_tracker/utils/consts.dart';
 
+import 'route_dialog.dart';
+
 class RoutesPage extends StatefulWidget {
   const RoutesPage({Key? key}) : super(key: key);
 
@@ -12,6 +14,17 @@ class RoutesPage extends StatefulWidget {
 }
 
 class _RoutesPageState extends State<RoutesPage> {
+  void handleEditRoute(BuildContext context, int key, TripRoute route) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return RouteDialog(
+            routeKey: key,
+            route: route,
+          );
+        });
+  }
+
   void handleDeleteRoute(int key) {
     Hive.box<TripRoute>(hiveRoutesBox).delete(key);
   }
@@ -36,6 +49,9 @@ class _RoutesPageState extends State<RoutesPage> {
                 final TripRoute route = box.get(key);
                 return RouteListItem(
                   routeName: route.name,
+                  onEdit: () {
+                    handleEditRoute(context, key, route);
+                  },
                   onDelete: () {
                     handleDeleteRoute(key);
                   },

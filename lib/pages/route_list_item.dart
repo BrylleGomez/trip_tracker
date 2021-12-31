@@ -2,9 +2,13 @@ import 'package:flutter/material.dart';
 
 class RouteListItem extends StatelessWidget {
   final String routeName;
+  final Function() onEdit;
   final Function() onDelete;
   const RouteListItem(
-      {Key? key, required this.routeName, required this.onDelete})
+      {Key? key,
+      required this.routeName,
+      required this.onEdit,
+      required this.onDelete})
       : super(key: key);
 
   @override
@@ -20,7 +24,11 @@ class RouteListItem extends StatelessWidget {
               ),
             ),
           ),
-          const IconButton(onPressed: null, icon: Icon(Icons.edit)),
+          IconButton(
+            onPressed: onEdit,
+            icon: const Icon(Icons.edit),
+            color: Colors.blue,
+          ),
           IconButton(
             onPressed: onDelete,
             icon: const Icon(Icons.delete),
