@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:trip_tracker/home_page.dart';
+import 'package:trip_tracker/models/route.dart';
 import 'package:trip_tracker/utils/consts.dart';
 
 void main() async {
   await Hive.initFlutter();
-  await Hive.openBox(hiveRoutesBox);
+  Hive.registerAdapter(TripRouteAdapter());
+  await Hive.openBox<TripRoute>(hiveRoutesBox);
   runApp(const MyApp());
 }
 

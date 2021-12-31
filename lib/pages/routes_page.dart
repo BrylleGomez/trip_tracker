@@ -18,22 +18,32 @@ class _RoutesPageState extends State<RoutesPage> {
     setState(() {
       routes.add(newRoute);
     });
+    Hive.box<TripRoute>(hiveRoutesBox).add(newRoute);
   }
 
   @override
   Widget build(BuildContext context) {
     return Center(
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.start,
         children: <Widget>[
           TextButton.icon(
               onPressed: addNewRoute,
               icon: const Icon(Icons.add_location_alt_rounded),
               label: const Text('Add New Route')),
           ValueListenableBuilder<Box>(
-            valueListenable: Hive.box(hiveRoutesBox).listenable(),
+            valueListenable: Hive.box<TripRoute>(hiveRoutesBox).listenable(),
             builder: (context, box, widget) {
-              return Text(box.get(0) ?? 'Heh');
+              List<int> keys = box.keys.cast<int>().toList();
+              return ListView.builder(
+                shrinkWrap: true,
+                itemCount: keys.length,
+                itemBuilder: (BuildContext context, int index) {
+                  final int key = keys[index];
+                  final dynamic route = box.get(key);
+                  return Text(route.name);
+                },
+              );
             },
           ),
           // ListView.builder(
