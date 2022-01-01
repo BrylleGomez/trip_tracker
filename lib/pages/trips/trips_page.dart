@@ -3,6 +3,8 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:trip_tracker/models/trip.dart';
 import 'package:trip_tracker/utils/consts.dart';
 
+import 'trip_list_item.dart';
+
 class TripsPage extends StatefulWidget {
   const TripsPage({Key? key}) : super(key: key);
 
@@ -64,19 +66,18 @@ class _TripsPageState extends State<TripsPage> {
               itemBuilder: (BuildContext context, int index) {
                 final int key = keys[index];
                 final Trip trip = box.get(key);
-                return Text(trip.toString());
-                // return RouteListItem(
-                //   routeName: trip.name,
-                //   onView: () {
-                //     handleViewTrip(context, key, trip);
-                //   },
-                //   onEdit: () {
-                //     handleEditTrip(context, key, trip);
-                //   },
-                //   onDelete: () {
-                //     handleDeleteTrip(context, key);
-                //   },
-                // );
+                return TripListItem(
+                  trip: trip,
+                  onView: () {
+                    handleViewTrip(context, key, trip);
+                  },
+                  onEdit: () {
+                    handleEditTrip(context, key, trip);
+                  },
+                  onDelete: () {
+                    handleDeleteTrip(context, key);
+                  },
+                );
               },
             ),
           );
