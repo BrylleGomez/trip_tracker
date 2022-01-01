@@ -32,12 +32,10 @@ class RouteListItem extends StatelessWidget {
             IconButton(
               onPressed: onEdit,
               icon: const Icon(Icons.edit),
-              color: Colors.blue,
             ),
             IconButton(
               onPressed: onDelete,
               icon: const Icon(Icons.delete),
-              color: Colors.blue,
             )
           ],
           mainAxisSize: MainAxisSize.min,
