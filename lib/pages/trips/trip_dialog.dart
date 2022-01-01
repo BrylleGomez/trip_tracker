@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:trip_tracker/models/trip.dart';
 import 'package:trip_tracker/utils/format_datetime.dart';
 
@@ -30,6 +31,8 @@ class _TripDialogState extends State<TripDialog> {
   int _endHour = DateTime.now().hour;
   int _endMinute = DateTime.now().minute;
   int _date = DateTime.now().millisecondsSinceEpoch;
+  final _startMileageFieldController = TextEditingController();
+  final _endMileageFieldController = TextEditingController();
 
   void _selectStartTime(BuildContext context) async {
     final TimeOfDay? selectedTime = await showTimePicker(
@@ -69,6 +72,28 @@ class _TripDialogState extends State<TripDialog> {
         _date = selectedDate.millisecondsSinceEpoch;
       });
     }
+  }
+
+  void _handleCancelPressed(BuildContext context) {
+    Navigator.of(context).pop();
+  }
+
+  void _handleSavePressed(BuildContext context) {
+    // if (widget.route == null && widget.routeKey == null) {
+    //   if (_formKey.currentState!.validate()) {
+    //     final newRoute = TripRoute(
+    //         name: _nameFieldController.text, path: _pathFieldController.text);
+    //     Hive.box<TripRoute>(hiveRoutesBox).add(newRoute);
+    //     Navigator.of(context).pop();
+    //   }
+    // } else if (widget.route != null && widget.routeKey != null) {
+    //   if (_formKey.currentState!.validate()) {
+    //     final updatedRoute = TripRoute(
+    //         name: _nameFieldController.text, path: _pathFieldController.text);
+    //     Hive.box<TripRoute>(hiveRoutesBox).put(widget.routeKey, updatedRoute);
+    //     Navigator.of(context).pop();
+    //   }
+    // }
   }
 
   @override
@@ -143,9 +168,65 @@ class _TripDialogState extends State<TripDialog> {
                     )
                   ],
                 ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 8.0),
+                  child: TextFormField(
+                    controller: _startMileageFieldController,
+                    keyboardType: TextInputType.number,
+                    decoration: const InputDecoration(
+                        labelText: 'Start Mileage',
+                        border: OutlineInputBorder(),
+                        isDense: true),
+                    validator: (value) {
+                      if (value != null && value.isNotEmpty) {
+                        return null;
+                      } else {
+                        return "Please enter your starting mileage!";
+                      }
+                    },
+                    enabled: !isViewing,
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 8.0),
+                  child: TextFormField(
+                    controller: _endMileageFieldController,
+                    keyboardType: TextInputType.number,
+                    decoration: const InputDecoration(
+                        labelText: 'End Mileage',
+                        border: OutlineInputBorder(),
+                        isDense: true),
+                    validator: (value) {
+                      if (value != null && value.isNotEmpty) {
+                        return null;
+                      } else {
+                        return "Please enter your ending mileage!";
+                      }
+                    },
+                    enabled: !isViewing,
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  ),
+                )
               ],
             )),
       ),
+      actions: isViewing
+          ? []
+          : [
+              TextButton(
+                onPressed: () {
+                  _handleCancelPressed(context);
+                },
+                child: const Text('Cancel'),
+              ),
+              TextButton(
+                onPressed: () {
+                  _handleSavePressed(context);
+                },
+                child: const Text('Save'),
+              ),
+            ],
     );
   }
 }

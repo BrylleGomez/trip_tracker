@@ -82,7 +82,7 @@ class _RouteDialogState extends State<RouteDialog> {
                 enabled: !widget.isViewing,
               ),
               const SizedBox(
-                height: 16.0,
+                height: 8.0,
               ),
               TextFormField(
                 controller: _pathFieldController,
