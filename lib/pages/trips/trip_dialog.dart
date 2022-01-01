@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:trip_tracker/models/trip.dart';
+import 'package:trip_tracker/utils/format_time.dart';
 
 class TripDialog extends StatefulWidget {
   final TripDialogStatus dialogStatus;
@@ -24,6 +25,36 @@ class TripDialog extends StatefulWidget {
 
 class _TripDialogState extends State<TripDialog> {
   final _formKey = GlobalKey<FormState>();
+  int _startHour = DateTime.now().hour;
+  int _startMinute = DateTime.now().minute;
+  int _endHour = DateTime.now().hour;
+  int _endMinute = DateTime.now().minute;
+
+  void _selectStartTime(BuildContext context) async {
+    final TimeOfDay? selectedTime = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay(hour: _startHour, minute: _startMinute),
+    );
+    if (selectedTime != null) {
+      setState(() {
+        _startHour = selectedTime.hour;
+        _startMinute = selectedTime.minute;
+      });
+    }
+  }
+
+  void _selectEndTime(BuildContext context) async {
+    final TimeOfDay? selectedTime = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay(hour: _endHour, minute: _endMinute),
+    );
+    if (selectedTime != null) {
+      setState(() {
+        _endHour = selectedTime.hour;
+        _endMinute = selectedTime.minute;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -58,23 +89,31 @@ class _TripDialogState extends State<TripDialog> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                TextFormField(
-                  controller: null,
-                  decoration: const InputDecoration(
-                      labelText: 'Trip Name',
-                      border: OutlineInputBorder(),
-                      isDense: true),
-                  validator: (value) {
-                    if (value != null && value.isNotEmpty) {
-                      return null;
-                    } else {
-                      return "Please enter a trip name!";
-                    }
-                  },
-                  enabled: !isViewing,
+                Row(
+                  children: [
+                    const Text('Start Time: '),
+                    TextButton(
+                      onPressed: isViewing
+                          ? null
+                          : () {
+                              _selectStartTime(context);
+                            },
+                      child: Text(formatTime(_startHour, _startMinute)),
+                    )
+                  ],
                 ),
-                const SizedBox(
-                  height: 16.0,
+                Row(
+                  children: [
+                    const Text('End Time: '),
+                    TextButton(
+                      onPressed: isViewing
+                          ? null
+                          : () {
+                              _selectEndTime(context);
+                            },
+                      child: Text(formatTime(_endHour, _endMinute)),
+                    )
+                  ],
                 ),
               ],
             )),
