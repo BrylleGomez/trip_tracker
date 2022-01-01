@@ -4,35 +4,41 @@ part 'trip.g.dart';
 @HiveType(typeId: 3)
 class Trip {
   @HiveField(0)
-  final DateTime startTime;
+  final int startHour;
   @HiveField(1)
-  final DateTime endTime;
+  final int startMinute;
   @HiveField(2)
-  final int startMileage;
+  final int endHour;
   @HiveField(3)
-  final int endMileage;
+  final int endMinute;
   @HiveField(4)
-  final int routeKey;
+  final String date;
   @HiveField(5)
-  final String notes;
+  final int startMileage;
   @HiveField(6)
-  final int tripDuration;
+  final int endMileage;
   @HiveField(7)
-  final int tripDistance;
+  final int routeKey;
   @HiveField(8)
-  final DateTime date;
+  final String notes;
   @HiveField(9)
+  final int tripDuration;
+  @HiveField(10)
+  final int tripDistance;
+  @HiveField(11)
   final String weekday;
 
   const Trip(
-      {required this.startTime,
-      required this.endTime,
+      {required this.startHour,
+      required this.startMinute,
+      required this.endHour,
+      required this.endMinute,
+      required this.date,
       required this.startMileage,
       required this.endMileage,
       required this.routeKey,
       required this.notes,
       required this.tripDuration,
       required this.tripDistance,
-      required this.date,
       required this.weekday});
 }

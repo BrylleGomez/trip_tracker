@@ -26,8 +26,7 @@ class TripListItem extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.only(left: 12.0),
                 child: Text(
-                  trip.startTime.toLocal().toIso8601String(),
-                ),
+                    '${trip.startHour}:${trip.startMinute} - ${trip.endHour}:${trip.endMinute}'),
               ),
             ),
             IconButton(

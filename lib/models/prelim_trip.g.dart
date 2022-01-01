@@ -17,30 +17,39 @@ class PrelimTripAdapter extends TypeAdapter<PrelimTrip> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return PrelimTrip(
-      startTime: fields[0] as DateTime?,
-      endTime: fields[1] as DateTime?,
-      startMileage: fields[2] as int?,
-      endMileage: fields[3] as int?,
-      routeKey: fields[4] as int?,
-      notes: fields[5] as String?,
+      startHour: fields[0] as int?,
+      startMinute: fields[1] as int?,
+      endHour: fields[2] as int?,
+      endMinute: fields[3] as int?,
+      date: fields[4] as String?,
+      startMileage: fields[5] as int?,
+      endMileage: fields[6] as int?,
+      routeKey: fields[7] as int?,
+      notes: fields[8] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, PrelimTrip obj) {
     writer
-      ..writeByte(6)
+      ..writeByte(9)
       ..writeByte(0)
-      ..write(obj.startTime)
+      ..write(obj.startHour)
       ..writeByte(1)
-      ..write(obj.endTime)
+      ..write(obj.startMinute)
       ..writeByte(2)
-      ..write(obj.startMileage)
+      ..write(obj.endHour)
       ..writeByte(3)
-      ..write(obj.endMileage)
+      ..write(obj.endMinute)
       ..writeByte(4)
-      ..write(obj.routeKey)
+      ..write(obj.date)
       ..writeByte(5)
+      ..write(obj.startMileage)
+      ..writeByte(6)
+      ..write(obj.endMileage)
+      ..writeByte(7)
+      ..write(obj.routeKey)
+      ..writeByte(8)
       ..write(obj.notes);
   }
 
