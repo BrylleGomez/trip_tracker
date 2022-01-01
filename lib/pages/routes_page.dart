@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:trip_tracker/models/route.dart';
+import 'package:trip_tracker/pages/confirm_dialog.dart';
 import 'package:trip_tracker/pages/route_list_item.dart';
 import 'package:trip_tracker/utils/consts.dart';
 
@@ -37,8 +38,16 @@ class _RoutesPageState extends State<RoutesPage> {
         });
   }
 
-  void handleDeleteRoute(int key) {
-    Hive.box<TripRoute>(hiveRoutesBox).delete(key);
+  void handleDeleteRoute(BuildContext context, int key) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return ConfirmDialog(
+              message: 'Are you sure you want to delete this route?',
+              title: 'Delete Route',
+              onConfirm: () =>
+                  {Hive.box<TripRoute>(hiveRoutesBox).delete(key)});
+        });
   }
 
   @override
@@ -68,7 +77,7 @@ class _RoutesPageState extends State<RoutesPage> {
                     handleEditRoute(context, key, route);
                   },
                   onDelete: () {
-                    handleDeleteRoute(key);
+                    handleDeleteRoute(context, key);
                   },
                 );
               },
