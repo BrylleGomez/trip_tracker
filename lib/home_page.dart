@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:trip_tracker/pages/routes/routes_page.dart';
+import 'package:trip_tracker/pages/trips/trip_dialog.dart';
 import 'package:trip_tracker/pages/trips/trips_page.dart';
 
 import 'pages/routes/route_dialog.dart';
@@ -19,9 +20,16 @@ class _HomePageState extends State<HomePage> {
     showDialog(
         context: context,
         builder: (BuildContext context) {
-          return const RouteDialog(
-            routeKey: null,
-            route: null,
+          return const RouteDialog();
+        });
+  }
+
+  void showNewTripDialog(BuildContext context) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return TripDialog(
+            dialogStatus: TripDialogStatus.adding,
           );
         });
   }
@@ -45,6 +53,9 @@ class _HomePageState extends State<HomePage> {
     switch (pageIdx) {
       case 0:
         showNewRouteDialog(context);
+        break;
+      case 1:
+        showNewTripDialog(context);
         break;
       default:
         showNewRouteDialog(context);
