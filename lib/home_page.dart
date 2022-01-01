@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-import 'package:trip_tracker/pages/routes_page.dart';
-import 'package:trip_tracker/pages/trips_page.dart';
+import 'package:trip_tracker/pages/routes/routes_page.dart';
+import 'package:trip_tracker/pages/trips/trips_page.dart';
 
-import 'pages/route_dialog.dart';
+import 'pages/routes/route_dialog.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);

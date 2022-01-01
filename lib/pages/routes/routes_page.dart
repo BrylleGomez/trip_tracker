@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:trip_tracker/models/route.dart';
-import 'package:trip_tracker/pages/confirm_dialog.dart';
-import 'package:trip_tracker/pages/route_list_item.dart';
+import 'package:trip_tracker/widgets/confirm_dialog.dart';
+import 'package:trip_tracker/pages/routes/route_list_item.dart';
 import 'package:trip_tracker/utils/consts.dart';
 
 import 'route_dialog.dart';
