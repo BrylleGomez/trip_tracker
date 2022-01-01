@@ -21,7 +21,7 @@ class PrelimTripAdapter extends TypeAdapter<PrelimTrip> {
       startMinute: fields[1] as int?,
       endHour: fields[2] as int?,
       endMinute: fields[3] as int?,
-      date: fields[4] as String?,
+      date: fields[4] as int?,
       startMileage: fields[5] as int?,
       endMileage: fields[6] as int?,
       routeKey: fields[7] as int?,

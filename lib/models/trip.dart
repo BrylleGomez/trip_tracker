@@ -12,7 +12,7 @@ class Trip {
   @HiveField(3)
   final int endMinute;
   @HiveField(4)
-  final String date;
+  final int date;
   @HiveField(5)
   final int startMileage;
   @HiveField(6)

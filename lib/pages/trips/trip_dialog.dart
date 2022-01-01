@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:trip_tracker/models/trip.dart';
-import 'package:trip_tracker/utils/format_time.dart';
+import 'package:trip_tracker/utils/format_datetime.dart';
 
 class TripDialog extends StatefulWidget {
   final TripDialogStatus dialogStatus;
@@ -29,6 +29,7 @@ class _TripDialogState extends State<TripDialog> {
   int _startMinute = DateTime.now().minute;
   int _endHour = DateTime.now().hour;
   int _endMinute = DateTime.now().minute;
+  int _date = DateTime.now().millisecondsSinceEpoch;
 
   void _selectStartTime(BuildContext context) async {
     final TimeOfDay? selectedTime = await showTimePicker(
@@ -52,6 +53,20 @@ class _TripDialogState extends State<TripDialog> {
       setState(() {
         _endHour = selectedTime.hour;
         _endMinute = selectedTime.minute;
+      });
+    }
+  }
+
+  void _selectDate(BuildContext context) async {
+    final DateTime? selectedDate = await showDatePicker(
+        context: context,
+        initialDate: DateTime.fromMillisecondsSinceEpoch(_date),
+        initialDatePickerMode: DatePickerMode.day,
+        firstDate: DateTime(2022),
+        lastDate: DateTime(2100));
+    if (selectedDate != null) {
+      setState(() {
+        _date = selectedDate.millisecondsSinceEpoch;
       });
     }
   }
@@ -112,6 +127,19 @@ class _TripDialogState extends State<TripDialog> {
                               _selectEndTime(context);
                             },
                       child: Text(formatTime(_endHour, _endMinute)),
+                    )
+                  ],
+                ),
+                Row(
+                  children: [
+                    const Text('Date: '),
+                    TextButton(
+                      onPressed: isViewing
+                          ? null
+                          : () {
+                              _selectDate(context);
+                            },
+                      child: Text(formatDate(_date)),
                     )
                   ],
                 ),
