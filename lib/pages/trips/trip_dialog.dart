@@ -33,6 +33,7 @@ class TripDialog extends StatefulWidget {
 
 class _TripDialogState extends State<TripDialog> {
   late bool _isViewingOrEditing;
+  late bool _isViewing;
 
   final _formKey = GlobalKey<FormState>();
 
@@ -52,6 +53,7 @@ class _TripDialogState extends State<TripDialog> {
 
     _isViewingOrEditing = widget.dialogStatus == TripDialogStatus.viewing ||
         widget.dialogStatus == TripDialogStatus.editing;
+    _isViewing = widget.dialogStatus == TripDialogStatus.viewing;
 
     _startHour =
         _isViewingOrEditing ? widget.trip!.startHour : DateTime.now().hour;
@@ -333,7 +335,23 @@ class _TripDialogState extends State<TripDialog> {
                         isDense: true),
                     enabled: !isViewing,
                   ),
-                )
+                ),
+                if (_isViewing) ...[
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8.0),
+                    child:
+                        Text('Duration: ${widget.trip!.tripDuration} minutes'),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8.0),
+                    child: Text(
+                        'Distance: ${widget.trip!.tripDistance} kilometers'),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8.0),
+                    child: Text('Day of the Week: ${widget.trip!.weekday}'),
+                  )
+                ]
               ],
             )),
       ),
