@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:trip_tracker/models/trip.dart';
+import 'package:trip_tracker/utils/format_datetime.dart';
 
 class TripListItem extends StatelessWidget {
   final Trip trip;
@@ -26,7 +27,7 @@ class TripListItem extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.only(left: 12.0),
                 child: Text(
-                    '${trip.startHour}:${trip.startMinute} - ${trip.endHour}:${trip.endMinute}'),
+                    '${formatDate(trip.date)} // ${formatTime(trip.startHour, trip.startMinute)} - ${formatTime(trip.endHour, trip.endMinute)}'),
               ),
             ),
             IconButton(

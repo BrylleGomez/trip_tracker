@@ -7,6 +7,8 @@ import 'package:trip_tracker/models/route.dart';
 import 'package:trip_tracker/models/trip.dart';
 import 'package:trip_tracker/utils/consts.dart';
 import 'package:trip_tracker/utils/format_datetime.dart';
+import 'package:trip_tracker/utils/get_duration.dart';
+import 'package:trip_tracker/utils/get_weekday.dart';
 
 class TripDialog extends StatefulWidget {
   final TripDialogStatus dialogStatus;
@@ -38,7 +40,7 @@ class _TripDialogState extends State<TripDialog> {
   int _date = DateTime.now().millisecondsSinceEpoch;
   final _startMileageFieldController = TextEditingController();
   final _endMileageFieldController = TextEditingController();
-  int _routeKey = -1;
+  int _routeKey = Hive.box<TripRoute>(hiveRoutesBox).keys.isNotEmpty ? 0 : -1;
   final _notesFieldController = TextEditingController();
 
   void _selectStartTime(BuildContext context) async {
@@ -86,22 +88,27 @@ class _TripDialogState extends State<TripDialog> {
   }
 
   void _handleSavePressed(BuildContext context) {
-    _formKey.currentState!.validate();
-    // if (widget.route == null && widget.routeKey == null) {
-    //   if (_formKey.currentState!.validate()) {
-    //     final newRoute = TripRoute(
-    //         name: _nameFieldController.text, path: _pathFieldController.text);
-    //     Hive.box<TripRoute>(hiveRoutesBox).add(newRoute);
-    //     Navigator.of(context).pop();
-    //   }
-    // } else if (widget.route != null && widget.routeKey != null) {
-    //   if (_formKey.currentState!.validate()) {
-    //     final updatedRoute = TripRoute(
-    //         name: _nameFieldController.text, path: _pathFieldController.text);
-    //     Hive.box<TripRoute>(hiveRoutesBox).put(widget.routeKey, updatedRoute);
-    //     Navigator.of(context).pop();
-    //   }
-    // }
+    if (_formKey.currentState!.validate()) {
+      final startMileage = int.parse(_startMileageFieldController.text);
+      final endMileage = int.parse(_endMileageFieldController.text);
+      final newTrip = Trip(
+          startHour: _startHour,
+          startMinute: _startMinute,
+          endHour: _endHour,
+          endMinute: _endMinute,
+          date: _date,
+          startMileage: startMileage,
+          endMileage: endMileage,
+          routeKey: _routeKey,
+          notes: _notesFieldController.text,
+          tripDuration:
+              getDuration(_startHour, _startMinute, _endHour, _endMinute),
+          tripDistance: endMileage - startMileage,
+          weekday: WeekdayUtils.enumToStr(WeekdayUtils.weekdayFromDatetime(
+              DateTime.fromMillisecondsSinceEpoch(_date))));
+      Hive.box<Trip>(hiveTripsBox).add(newTrip);
+      Navigator.of(context).pop();
+    }
   }
 
   @override
