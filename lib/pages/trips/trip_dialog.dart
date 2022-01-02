@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:collection/collection.dart';
+
+import 'package:trip_tracker/models/route.dart';
 import 'package:trip_tracker/models/trip.dart';
+import 'package:trip_tracker/utils/consts.dart';
 import 'package:trip_tracker/utils/format_datetime.dart';
 
 class TripDialog extends StatefulWidget {
@@ -33,6 +38,8 @@ class _TripDialogState extends State<TripDialog> {
   int _date = DateTime.now().millisecondsSinceEpoch;
   final _startMileageFieldController = TextEditingController();
   final _endMileageFieldController = TextEditingController();
+  int _routeKey = -1;
+  final _notesFieldController = TextEditingController();
 
   void _selectStartTime(BuildContext context) async {
     final TimeOfDay? selectedTime = await showTimePicker(
@@ -79,6 +86,7 @@ class _TripDialogState extends State<TripDialog> {
   }
 
   void _handleSavePressed(BuildContext context) {
+    _formKey.currentState!.validate();
     // if (widget.route == null && widget.routeKey == null) {
     //   if (_formKey.currentState!.validate()) {
     //     final newRoute = TripRoute(
@@ -119,6 +127,13 @@ class _TripDialogState extends State<TripDialog> {
 
     // Get whether viewing
     bool isViewing = widget.dialogStatus == TripDialogStatus.viewing;
+
+    // Get list of routes with index
+    List<TripRouteWithIndex> routes = Hive.box<TripRoute>(hiveRoutesBox)
+        .values
+        .mapIndexed((idx, route) => TripRouteWithIndex(
+            routeIndex: idx, name: route.name, path: route.path))
+        .toList();
 
     // Render widget
     return AlertDialog(
@@ -169,43 +184,111 @@ class _TripDialogState extends State<TripDialog> {
                   ],
                 ),
                 Padding(
+                  padding: const EdgeInsets.only(top: 4.0),
+                  child: Row(
+                    children: [
+                      const Text('Mileage:'),
+                      const SizedBox(width: 8),
+                      SizedBox(
+                        width: 85,
+                        child: TextFormField(
+                          controller: _startMileageFieldController,
+                          keyboardType: TextInputType.number,
+                          decoration: const InputDecoration(
+                              labelText: 'Start',
+                              border: OutlineInputBorder(),
+                              isDense: true),
+                          validator: (value) {
+                            if (value != null && value.isNotEmpty) {
+                              return null;
+                            } else {
+                              return "Please enter your starting mileage!";
+                            }
+                          },
+                          enabled: !isViewing,
+                          inputFormatters: [
+                            FilteringTextInputFormatter.digitsOnly
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      SizedBox(
+                        width: 85,
+                        child: TextFormField(
+                          controller: _endMileageFieldController,
+                          keyboardType: TextInputType.number,
+                          decoration: const InputDecoration(
+                              labelText: 'End',
+                              border: OutlineInputBorder(),
+                              isDense: true),
+                          validator: (value) {
+                            if (value != null && value.isNotEmpty) {
+                              return null;
+                            } else {
+                              return "Please enter your ending mileage!";
+                            }
+                          },
+                          enabled: !isViewing,
+                          inputFormatters: [
+                            FilteringTextInputFormatter.digitsOnly
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Padding(
                   padding: const EdgeInsets.only(top: 8.0),
-                  child: TextFormField(
-                    controller: _startMileageFieldController,
-                    keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(
-                        labelText: 'Start Mileage',
-                        border: OutlineInputBorder(),
-                        isDense: true),
-                    validator: (value) {
-                      if (value != null && value.isNotEmpty) {
-                        return null;
-                      } else {
-                        return "Please enter your starting mileage!";
-                      }
-                    },
-                    enabled: !isViewing,
-                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  child: Row(
+                    children: [
+                      const Text('Route:'),
+                      const SizedBox(width: 8.0),
+                      SizedBox(
+                        width: 200,
+                        child: DropdownButtonFormField<int>(
+                          hint: const Text('No routes.'),
+                          value: _routeKey,
+                          icon: const Icon(Icons.arrow_downward),
+                          // elevation: 16,
+                          // style: const TextStyle(color: Colors.deepPurple),
+                          // underline: Container(
+                          //   height: 2,
+                          //   color: Colors.deepPurpleAccent,
+                          // ),
+                          onChanged: (int? newRouteIdx) {
+                            setState(() {
+                              _routeKey = newRouteIdx!;
+                            });
+                          },
+                          decoration: const InputDecoration(
+                              border: OutlineInputBorder(), isDense: true),
+                          items: routes
+                              .map((route) => DropdownMenuItem<int>(
+                                    value: route.routeIndex,
+                                    child: Text(route.name),
+                                  ))
+                              .toList(),
+                          validator: (value) {
+                            if (value != null && value >= 0) {
+                              return null;
+                            } else {
+                              return "Please select a route!";
+                            }
+                          },
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 Padding(
                   padding: const EdgeInsets.only(top: 8.0),
                   child: TextFormField(
-                    controller: _endMileageFieldController,
-                    keyboardType: TextInputType.number,
+                    controller: _notesFieldController,
                     decoration: const InputDecoration(
-                        labelText: 'End Mileage',
+                        labelText: 'Notes',
                         border: OutlineInputBorder(),
                         isDense: true),
-                    validator: (value) {
-                      if (value != null && value.isNotEmpty) {
-                        return null;
-                      } else {
-                        return "Please enter your ending mileage!";
-                      }
-                    },
                     enabled: !isViewing,
-                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                   ),
                 )
               ],
@@ -232,3 +315,11 @@ class _TripDialogState extends State<TripDialog> {
 }
 
 enum TripDialogStatus { adding, continuing, editing, viewing }
+
+class TripRouteWithIndex extends TripRoute {
+  int routeIndex;
+
+  TripRouteWithIndex(
+      {required this.routeIndex, required String name, required String path})
+      : super(name: name, path: path);
+}
