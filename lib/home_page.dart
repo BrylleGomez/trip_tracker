@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:trip_tracker/models/prelim_trip.dart';
 
 import 'package:trip_tracker/pages/routes/routes_page.dart';
 import 'package:trip_tracker/pages/trips/trip_dialog.dart';
 import 'package:trip_tracker/pages/trips/trips_page.dart';
 
 import 'pages/routes/route_dialog.dart';
+import 'utils/consts.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -25,13 +28,25 @@ class _HomePageState extends State<HomePage> {
   }
 
   void showNewTripDialog(BuildContext context) {
-    showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return TripDialog(
-            dialogStatus: TripDialogStatus.adding,
-          );
-        });
+    PrelimTrip? prelimTrip = Hive.box<PrelimTrip>(hivePrelimTripBox).get(0);
+    if (prelimTrip == null) {
+      showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return TripDialog(
+              dialogStatus: TripDialogStatus.adding,
+            );
+          });
+    } else {
+      showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return TripDialog(
+              dialogStatus: TripDialogStatus.continuing,
+              prelimTrip: prelimTrip,
+            );
+          });
+    }
   }
 
   final List<Page> _pages = [

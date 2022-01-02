@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:collection/collection.dart';
+import 'package:trip_tracker/models/prelim_trip.dart';
 
 import 'package:trip_tracker/models/route.dart';
 import 'package:trip_tracker/models/trip.dart';
@@ -14,8 +15,13 @@ class TripDialog extends StatefulWidget {
   final TripDialogStatus dialogStatus;
   final int? tripKey;
   final Trip? trip;
+  final PrelimTrip? prelimTrip;
   const TripDialog(
-      {Key? key, required this.dialogStatus, this.tripKey, this.trip})
+      {Key? key,
+      required this.dialogStatus,
+      this.tripKey,
+      this.trip,
+      this.prelimTrip})
       : assert((dialogStatus == TripDialogStatus.adding &&
                 tripKey == null &&
                 trip == null) ||
@@ -24,7 +30,9 @@ class TripDialog extends StatefulWidget {
                 trip != null) ||
             (dialogStatus == TripDialogStatus.viewing &&
                 tripKey != null &&
-                trip != null)),
+                trip != null) ||
+            (dialogStatus == TripDialogStatus.continuing &&
+                prelimTrip != null)),
         super(key: key);
 
   @override
@@ -34,6 +42,7 @@ class TripDialog extends StatefulWidget {
 class _TripDialogState extends State<TripDialog> {
   late bool _isViewingOrEditing;
   late bool _isViewing;
+  late bool _isContinuing;
 
   final _formKey = GlobalKey<FormState>();
 
@@ -55,26 +64,55 @@ class _TripDialogState extends State<TripDialog> {
     _isViewingOrEditing = widget.dialogStatus == TripDialogStatus.viewing ||
         widget.dialogStatus == TripDialogStatus.editing;
     _isViewing = widget.dialogStatus == TripDialogStatus.viewing;
+    _isContinuing = widget.dialogStatus == TripDialogStatus.continuing;
 
-    _startHour =
-        _isViewingOrEditing ? widget.trip!.startHour : DateTime.now().hour;
-    _startMinute =
-        _isViewingOrEditing ? widget.trip!.startMinute : DateTime.now().minute;
-    _endHour = _isViewingOrEditing ? widget.trip!.endHour : DateTime.now().hour;
-    _endMinute =
-        _isViewingOrEditing ? widget.trip!.endMinute : DateTime.now().minute;
+    _startHour = _isViewingOrEditing
+        ? widget.trip!.startHour
+        : _isContinuing
+            ? (widget.prelimTrip!.startHour ?? DateTime.now().hour)
+            : DateTime.now().hour;
+    _startMinute = _isViewingOrEditing
+        ? widget.trip!.startMinute
+        : _isContinuing
+            ? (widget.prelimTrip!.startMinute ?? DateTime.now().minute)
+            : DateTime.now().minute;
+    _endHour = _isViewingOrEditing
+        ? widget.trip!.endHour
+        : _isContinuing
+            ? (widget.prelimTrip!.endHour ?? DateTime.now().hour)
+            : DateTime.now().hour;
+    _endMinute = _isViewingOrEditing
+        ? widget.trip!.endMinute
+        : _isContinuing
+            ? (widget.prelimTrip!.endMinute ?? DateTime.now().minute)
+            : DateTime.now().minute;
     _date = _isViewingOrEditing
         ? widget.trip!.date
-        : DateTime.now().millisecondsSinceEpoch;
+        : _isContinuing
+            ? (widget.prelimTrip!.date ?? DateTime.now().millisecondsSinceEpoch)
+            : DateTime.now().millisecondsSinceEpoch;
     _routeKey = _isViewingOrEditing
         ? widget.trip!.routeKey
-        : (Hive.box<TripRoute>(hiveRoutesBox).keys.isNotEmpty ? 0 : -1);
+        : _isContinuing
+            ? (widget.prelimTrip!.routeKey ??
+                (Hive.box<TripRoute>(hiveRoutesBox).keys.isNotEmpty ? 0 : -1))
+            : (Hive.box<TripRoute>(hiveRoutesBox).keys.isNotEmpty ? 0 : -1);
 
-    _startMileageFieldController.text =
-        _isViewingOrEditing ? widget.trip!.startMileage.toString() : '';
-    _endMileageFieldController.text =
-        _isViewingOrEditing ? widget.trip!.endMileage.toString() : '';
-    _notesFieldController.text = _isViewingOrEditing ? widget.trip!.notes : '';
+    _startMileageFieldController.text = _isViewingOrEditing
+        ? widget.trip!.startMileage.toString()
+        : (_isContinuing && widget.prelimTrip!.startMileage != null)
+            ? widget.prelimTrip!.startMileage.toString()
+            : '';
+    _endMileageFieldController.text = _isViewingOrEditing
+        ? widget.trip!.endMileage.toString()
+        : (_isContinuing && widget.prelimTrip!.endMileage != null)
+            ? widget.prelimTrip!.endMileage.toString()
+            : '';
+    _notesFieldController.text = _isViewingOrEditing
+        ? widget.trip!.notes
+        : _isContinuing
+            ? widget.prelimTrip!.notes.toString()
+            : '';
   }
 
   void _selectStartTime(BuildContext context) async {
@@ -158,8 +196,26 @@ class _TripDialogState extends State<TripDialog> {
       } else {
         Hive.box<Trip>(hiveTripsBox).put(widget.tripKey, trip);
       }
+      Hive.box<PrelimTrip>(hivePrelimTripBox).delete(0);
       Navigator.of(context).pop();
     }
+  }
+
+  void _handleKeepPressed(BuildContext context) {
+    final int? startMileage = int.tryParse(_startMileageFieldController.text);
+    final int? endMileage = int.tryParse(_endMileageFieldController.text);
+    final prelimTrip = PrelimTrip(
+        startHour: _startHour,
+        startMinute: _startMinute,
+        endHour: _endHour,
+        endMinute: _endMinute,
+        date: _date,
+        startMileage: startMileage,
+        endMileage: endMileage,
+        routeKey: _routeKey,
+        notes: _notesFieldController.text);
+    Hive.box<PrelimTrip>(hivePrelimTripBox).put(0, prelimTrip);
+    Navigator.of(context).pop();
   }
 
   @override
@@ -398,6 +454,12 @@ class _TripDialogState extends State<TripDialog> {
                   _handleCancelPressed(context);
                 },
                 child: const Text('Cancel'),
+              ),
+              TextButton(
+                onPressed: () {
+                  _handleKeepPressed(context);
+                },
+                child: const Text('Keep'),
               ),
               TextButton(
                 onPressed: () {
