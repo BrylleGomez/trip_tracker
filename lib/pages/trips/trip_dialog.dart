@@ -7,8 +7,8 @@ import 'package:trip_tracker/models/route.dart';
 import 'package:trip_tracker/models/trip.dart';
 import 'package:trip_tracker/utils/consts.dart';
 import 'package:trip_tracker/utils/format_datetime.dart';
-import 'package:trip_tracker/utils/get_duration.dart';
-import 'package:trip_tracker/utils/get_weekday.dart';
+import 'package:trip_tracker/utils/datetime_utils.dart';
+import 'package:trip_tracker/utils/weekday_utils.dart';
 
 class TripDialog extends StatefulWidget {
   final TripDialogStatus dialogStatus;
@@ -122,7 +122,7 @@ class _TripDialogState extends State<TripDialog> {
     if (_formKey.currentState!.validate()) {
       final startMileage = int.parse(_startMileageFieldController.text);
       final endMileage = int.parse(_endMileageFieldController.text);
-      final newTrip = Trip(
+      final trip = Trip(
           startHour: _startHour,
           startMinute: _startMinute,
           endHour: _endHour,
@@ -137,7 +137,12 @@ class _TripDialogState extends State<TripDialog> {
           tripDistance: endMileage - startMileage,
           weekday: WeekdayUtils.enumToStr(WeekdayUtils.weekdayFromDatetime(
               DateTime.fromMillisecondsSinceEpoch(_date))));
-      Hive.box<Trip>(hiveTripsBox).add(newTrip);
+      if (widget.dialogStatus == TripDialogStatus.adding ||
+          widget.dialogStatus == TripDialogStatus.continuing) {
+        Hive.box<Trip>(hiveTripsBox).add(trip);
+      } else {
+        Hive.box<Trip>(hiveTripsBox).put(widget.tripKey, trip);
+      }
       Navigator.of(context).pop();
     }
   }

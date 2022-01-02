@@ -28,14 +28,15 @@ class _TripsPageState extends State<TripsPage> {
   }
 
   void handleEditTrip(BuildContext context, int key, Trip trip) {
-    // showDialog(
-    //     context: context,
-    //     builder: (BuildContext context) {
-    //       return RouteDialog(
-    //         routeKey: key,
-    //         route: route,
-    //       );
-    //     });
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return TripDialog(
+            dialogStatus: TripDialogStatus.editing,
+            tripKey: key,
+            trip: trip,
+          );
+        });
   }
 
   void handleDeleteTrip(BuildContext context, int key) {
