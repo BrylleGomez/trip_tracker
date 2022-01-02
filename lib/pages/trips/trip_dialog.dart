@@ -43,6 +43,8 @@ class _TripDialogState extends State<TripDialog> {
   late bool _isViewingOrEditing;
   late bool _isViewing;
   late bool _isContinuing;
+  late bool _isRoutesEmpty;
+  late int _firstRouteKey;
 
   final _formKey = GlobalKey<FormState>();
 
@@ -65,6 +67,9 @@ class _TripDialogState extends State<TripDialog> {
         widget.dialogStatus == TripDialogStatus.editing;
     _isViewing = widget.dialogStatus == TripDialogStatus.viewing;
     _isContinuing = widget.dialogStatus == TripDialogStatus.continuing;
+    _isRoutesEmpty = Hive.box<TripRoute>(hiveRoutesBox).keys.isEmpty;
+    _firstRouteKey =
+        !_isRoutesEmpty ? Hive.box<TripRoute>(hiveRoutesBox).keys.first : -1;
 
     _startHour = _isViewingOrEditing
         ? widget.trip!.startHour
@@ -95,8 +100,8 @@ class _TripDialogState extends State<TripDialog> {
         ? widget.trip!.routeKey
         : _isContinuing
             ? (widget.prelimTrip!.routeKey ??
-                (Hive.box<TripRoute>(hiveRoutesBox).keys.isNotEmpty ? 0 : -1))
-            : (Hive.box<TripRoute>(hiveRoutesBox).keys.isNotEmpty ? 0 : -1);
+                (!_isRoutesEmpty ? _firstRouteKey : -1))
+            : (!_isRoutesEmpty ? _firstRouteKey : -1);
 
     _startMileageFieldController.text = _isViewingOrEditing
         ? widget.trip!.startMileage.toString()
