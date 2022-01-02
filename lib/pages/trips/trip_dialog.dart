@@ -46,6 +46,7 @@ class _TripDialogState extends State<TripDialog> {
   final _endMileageFieldController = TextEditingController();
   late int _routeKey;
   final _notesFieldController = TextEditingController();
+  String _errorMessage = '';
 
   @override
   void initState() {
@@ -121,6 +122,18 @@ class _TripDialogState extends State<TripDialog> {
   }
 
   void _handleSavePressed(BuildContext context) {
+    bool isValidTime =
+        isValidTimeRange(_startHour, _startMinute, _endHour, _endMinute);
+    if (!isValidTime) {
+      setState(() {
+        _errorMessage = 'Please enter valid ending time!';
+      });
+      return;
+    } else {
+      setState(() {
+        _errorMessage = '';
+      });
+    }
     if (_formKey.currentState!.validate()) {
       final startMileage = int.parse(_startMileageFieldController.text);
       final endMileage = int.parse(_endMileageFieldController.text);
@@ -189,6 +202,7 @@ class _TripDialogState extends State<TripDialog> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // Start Time
                 Row(
                   children: [
                     const Text('Start Time: '),
@@ -202,6 +216,7 @@ class _TripDialogState extends State<TripDialog> {
                     )
                   ],
                 ),
+                // End Time
                 Row(
                   children: [
                     const Text('End Time: '),
@@ -215,6 +230,7 @@ class _TripDialogState extends State<TripDialog> {
                     )
                   ],
                 ),
+                // Date
                 Row(
                   children: [
                     const Text('Date: '),
@@ -228,6 +244,7 @@ class _TripDialogState extends State<TripDialog> {
                     )
                   ],
                 ),
+                // Mileage
                 Padding(
                   padding: const EdgeInsets.only(top: 8.0),
                   child: Row(
@@ -245,7 +262,7 @@ class _TripDialogState extends State<TripDialog> {
                             if (value != null && value.isNotEmpty) {
                               return null;
                             } else {
-                              return "Please enter your starting mileage!";
+                              return "Enter valid number!";
                             }
                           },
                           enabled: !isViewing,
@@ -265,10 +282,14 @@ class _TripDialogState extends State<TripDialog> {
                               border: OutlineInputBorder(),
                               isDense: true),
                           validator: (value) {
-                            if (value != null && value.isNotEmpty) {
+                            if (value != null &&
+                                value.isNotEmpty &&
+                                (int.parse(_endMileageFieldController.text) >
+                                    int.parse(
+                                        _startMileageFieldController.text))) {
                               return null;
                             } else {
-                              return "Please enter your ending mileage!";
+                              return "Enter valid number!";
                             }
                           },
                           enabled: !isViewing,
@@ -280,6 +301,7 @@ class _TripDialogState extends State<TripDialog> {
                     ],
                   ),
                 ),
+                // Route
                 Padding(
                   padding: const EdgeInsets.only(top: 8.0),
                   child: Row(
@@ -325,6 +347,7 @@ class _TripDialogState extends State<TripDialog> {
                     ],
                   ),
                 ),
+                // Notes
                 Padding(
                   padding: const EdgeInsets.only(top: 8.0),
                   child: TextFormField(
@@ -336,22 +359,34 @@ class _TripDialogState extends State<TripDialog> {
                     enabled: !isViewing,
                   ),
                 ),
+                // Calculated Info
                 if (_isViewing) ...[
+                  // Duration
                   Padding(
                     padding: const EdgeInsets.only(top: 8.0),
                     child:
                         Text('Duration: ${widget.trip!.tripDuration} minutes'),
                   ),
+                  // Distance
                   Padding(
                     padding: const EdgeInsets.only(top: 8.0),
                     child: Text(
                         'Distance: ${widget.trip!.tripDistance} kilometers'),
                   ),
+                  // Weekday
                   Padding(
                     padding: const EdgeInsets.only(top: 8.0),
                     child: Text('Day of the Week: ${widget.trip!.weekday}'),
                   )
-                ]
+                ],
+                //  Error Message
+                if (_errorMessage != '')
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8.0),
+                    child: Text(_errorMessage,
+                        style:
+                            const TextStyle(color: Colors.red, fontSize: 14.0)),
+                  )
               ],
             )),
       ),
