@@ -14,6 +14,9 @@ void main() async {
   await Hive.openBox<TripRoute>(hiveRoutesBox);
   await Hive.openBox<PrelimTrip>(hivePrelimTripBox);
   await Hive.openBox<Trip>(hiveTripsBox);
+  // Hive.box<TripRoute>(hiveRoutesBox).deleteFromDisk();
+  // Hive.box<PrelimTrip>(hivePrelimTripBox).deleteFromDisk();
+  // Hive.box<Trip>(hiveTripsBox).deleteFromDisk();
   runApp(const MyApp());
 }
 

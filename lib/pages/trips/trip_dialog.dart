@@ -243,10 +243,12 @@ class _TripDialogState extends State<TripDialog> {
     bool isViewing = widget.dialogStatus == TripDialogStatus.viewing;
 
     // Get list of routes with index
+    List<int> routeKeys =
+        Hive.box<TripRoute>(hiveRoutesBox).keys.cast<int>().toList();
     List<TripRouteWithIndex> routes = Hive.box<TripRoute>(hiveRoutesBox)
         .values
         .mapIndexed((idx, route) => TripRouteWithIndex(
-            routeIndex: idx, name: route.name, path: route.path))
+            routeIndex: routeKeys[idx], name: route.name, path: route.path))
         .toList();
 
     // Render widget
