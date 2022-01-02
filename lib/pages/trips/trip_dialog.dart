@@ -32,16 +32,47 @@ class TripDialog extends StatefulWidget {
 }
 
 class _TripDialogState extends State<TripDialog> {
+  late bool _isViewingOrEditing;
+
   final _formKey = GlobalKey<FormState>();
-  int _startHour = DateTime.now().hour;
-  int _startMinute = DateTime.now().minute;
-  int _endHour = DateTime.now().hour;
-  int _endMinute = DateTime.now().minute;
-  int _date = DateTime.now().millisecondsSinceEpoch;
+
+  late int _startHour;
+  late int _startMinute;
+  late int _endHour;
+  late int _endMinute;
+  late int _date;
   final _startMileageFieldController = TextEditingController();
   final _endMileageFieldController = TextEditingController();
-  int _routeKey = Hive.box<TripRoute>(hiveRoutesBox).keys.isNotEmpty ? 0 : -1;
+  late int _routeKey;
   final _notesFieldController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+
+    _isViewingOrEditing = widget.dialogStatus == TripDialogStatus.viewing ||
+        widget.dialogStatus == TripDialogStatus.editing;
+
+    _startHour =
+        _isViewingOrEditing ? widget.trip!.startHour : DateTime.now().hour;
+    _startMinute =
+        _isViewingOrEditing ? widget.trip!.startMinute : DateTime.now().minute;
+    _endHour = _isViewingOrEditing ? widget.trip!.endHour : DateTime.now().hour;
+    _endMinute =
+        _isViewingOrEditing ? widget.trip!.endMinute : DateTime.now().minute;
+    _date = _isViewingOrEditing
+        ? widget.trip!.date
+        : DateTime.now().millisecondsSinceEpoch;
+    _routeKey = _isViewingOrEditing
+        ? widget.trip!.routeKey
+        : (Hive.box<TripRoute>(hiveRoutesBox).keys.isNotEmpty ? 0 : -1);
+
+    _startMileageFieldController.text =
+        _isViewingOrEditing ? widget.trip!.startMileage.toString() : '';
+    _endMileageFieldController.text =
+        _isViewingOrEditing ? widget.trip!.endMileage.toString() : '';
+    _notesFieldController.text = _isViewingOrEditing ? widget.trip!.notes : '';
+  }
 
   void _selectStartTime(BuildContext context) async {
     final TimeOfDay? selectedTime = await showTimePicker(
@@ -191,18 +222,16 @@ class _TripDialogState extends State<TripDialog> {
                   ],
                 ),
                 Padding(
-                  padding: const EdgeInsets.only(top: 4.0),
+                  padding: const EdgeInsets.only(top: 8.0),
                   child: Row(
                     children: [
-                      const Text('Mileage:'),
-                      const SizedBox(width: 8),
                       SizedBox(
-                        width: 85,
+                        width: 125,
                         child: TextFormField(
                           controller: _startMileageFieldController,
                           keyboardType: TextInputType.number,
                           decoration: const InputDecoration(
-                              labelText: 'Start',
+                              labelText: 'Start Mileage',
                               border: OutlineInputBorder(),
                               isDense: true),
                           validator: (value) {
@@ -220,12 +249,12 @@ class _TripDialogState extends State<TripDialog> {
                       ),
                       const SizedBox(width: 8),
                       SizedBox(
-                        width: 85,
+                        width: 125,
                         child: TextFormField(
                           controller: _endMileageFieldController,
                           keyboardType: TextInputType.number,
                           decoration: const InputDecoration(
-                              labelText: 'End',
+                              labelText: 'End Mileage',
                               border: OutlineInputBorder(),
                               isDense: true),
                           validator: (value) {
@@ -262,11 +291,13 @@ class _TripDialogState extends State<TripDialog> {
                           //   height: 2,
                           //   color: Colors.deepPurpleAccent,
                           // ),
-                          onChanged: (int? newRouteIdx) {
-                            setState(() {
-                              _routeKey = newRouteIdx!;
-                            });
-                          },
+                          onChanged: !isViewing
+                              ? (int? newRouteIdx) {
+                                  setState(() {
+                                    _routeKey = newRouteIdx!;
+                                  });
+                                }
+                              : null,
                           decoration: const InputDecoration(
                               border: OutlineInputBorder(), isDense: true),
                           items: routes

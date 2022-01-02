@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:trip_tracker/models/trip.dart';
+import 'package:trip_tracker/pages/trips/trip_dialog.dart';
 import 'package:trip_tracker/utils/consts.dart';
 
 import 'trip_list_item.dart';
@@ -14,15 +15,15 @@ class TripsPage extends StatefulWidget {
 
 class _TripsPageState extends State<TripsPage> {
   void handleViewTrip(BuildContext context, int key, Trip trip) {
-    // showDialog(
-    //     context: context,
-    //     builder: (BuildContext context) {
-    //       return RouteDialog(
-    //         isViewing: true,
-    //         routeKey: key,
-    //         route: route,
-    //       );
-    //     });
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return TripDialog(
+            dialogStatus: TripDialogStatus.viewing,
+            tripKey: key,
+            trip: trip,
+          );
+        });
   }
 
   void handleEditTrip(BuildContext context, int key, Trip trip) {
@@ -61,6 +62,7 @@ class _TripsPageState extends State<TripsPage> {
         } else {
           return Scrollbar(
             child: ListView.builder(
+              reverse: true,
               shrinkWrap: true,
               itemCount: keys.length,
               itemBuilder: (BuildContext context, int index) {
