@@ -3,6 +3,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:trip_tracker/models/trip.dart';
 import 'package:trip_tracker/pages/trips/trip_dialog.dart';
 import 'package:trip_tracker/utils/consts.dart';
+import 'package:trip_tracker/widgets/confirm_dialog.dart';
 
 import 'trip_list_item.dart';
 
@@ -38,15 +39,14 @@ class _TripsPageState extends State<TripsPage> {
   }
 
   void handleDeleteTrip(BuildContext context, int key) {
-    // showDialog(
-    //     context: context,
-    //     builder: (BuildContext context) {
-    //       return ConfirmDialog(
-    //           message: 'Are you sure you want to delete this route?',
-    //           title: 'Delete Route',
-    //           onConfirm: () =>
-    //               {Hive.box<TripRoute>(hiveRoutesBox).delete(key)});
-    //     });
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return ConfirmDialog(
+              message: 'Are you sure you want to delete this trip?',
+              title: 'Delete Trip',
+              onConfirm: () => {Hive.box<Trip>(hiveTripsBox).delete(key)});
+        });
   }
 
   @override
