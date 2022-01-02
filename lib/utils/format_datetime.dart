@@ -14,3 +14,12 @@ String formatDate(int dateInMilliseconds) {
   return dateFormat
       .format(DateTime.fromMillisecondsSinceEpoch(dateInMilliseconds));
 }
+
+String formatShortDate(int dateInMilliseconds) {
+  final dateFormat = DateFormat('MMM dd');
+  // final String hourStr = ((hour < 10) ? '0' : '') + hour.toString();
+  // final String minStr = ((minute < 10) ? '0' : '') + minute.toString();
+  // return '$hourStr:$minStr';
+  return dateFormat
+      .format(DateTime.fromMillisecondsSinceEpoch(dateInMilliseconds));
+}

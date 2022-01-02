@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:trip_tracker/models/route.dart';
 import 'package:trip_tracker/models/trip.dart';
+import 'package:trip_tracker/utils/consts.dart';
 import 'package:trip_tracker/utils/format_datetime.dart';
 
 class TripListItem extends StatelessWidget {
@@ -17,6 +20,8 @@ class TripListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final routeName =
+        Hive.box<TripRoute>(hiveRoutesBox).get(trip.routeKey)?.name ?? '?';
     return Card(
       margin: const EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 0.0),
       child: InkWell(
@@ -27,7 +32,7 @@ class TripListItem extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.only(left: 12.0),
                 child: Text(
-                    '${formatDate(trip.date)} → ${formatTime(trip.startHour, trip.startMinute)} - ${formatTime(trip.endHour, trip.endMinute)}'),
+                    '${formatShortDate(trip.date)} ${trip.weekday.substring(0, 3)} - ${formatTime(trip.startHour, trip.startMinute)} - $routeName - ${trip.tripDuration} mins'),
               ),
             ),
             IconButton(
